@@ -347,6 +347,45 @@ WHERE A.AGE <= 20;
 
 SELECT * FROM TAB;
 
+-----------------------------------------------------------------------------------------------
+--하위쿼리(독자적 실행 O)
+SELECT USERID,USERNAME,ADDR1,SCHOL FROM CUSTOM
+WHERE USERID IN
+(SELECT USERID FROM COMPANY WHERE COMPANY LIKE '현대자동차%');
+--상관쿼리(독자적 실행 X)
+--EXISTS : 서브쿼리에 결과값이 하나 이상 존재하면 조건식 모두 TRUE, 존재하지 않으면 모두 FALSE
+--자주사용하지는 않음. 특정 서브쿼리 결과값의 존재유무를 통해 메인쿼리의 데이터 노출 여부를 결정해야 할때 사용
+SELECT USERID,USERNAME,ADDR1,SCHOL FROM CUSTOM
+WHERE EXISTS 
+(SELECT * FROM COMPANY WHERE USERID =CUSTOM.USERID AND COMPANY LIKE '현대자동차%');
+
+-----------------------------------------------------------------------------------------
+SELECT * FROM CUSTOM WHERE ADDR1='경기도' AND AGE <=20;
+
+SELECT * FROM (SELECT * FROM CUSTOM WHERE ADDR1='경기도') A
+WHERE AGE <=20;
+
+--DML(INSERT,UPDATE,DELETE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

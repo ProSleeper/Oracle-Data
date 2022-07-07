@@ -1,0 +1,41 @@
+--P141 연습문제
+1.
+SELECT COUNT(*) 인원수,MAX(SAL) 최대급여,MIN(SAL) 최소급여,
+SUM(SAL) 급여합계 FROM EMP; 
+
+2.
+SELECT JOB, MAX(SAL) 최대급여,MIN(SAL) 최소급여,
+SUM(SAL) 급여합계 FROM EMP
+GROUP BY JOB;
+
+3.
+SELECT JOB,COUNT(*) 인원수 FROM EMP
+GROUP BY JOB; 
+
+4.
+SELECT MAX(SAL)-MIN(SAL) 급여차액
+FROM EMP; 
+
+5.
+SELECT TO_CHAR(HIREDATE,'YY') H_YEAR,COUNT(*),MIN(SAL),
+MAX(SAL),AVG(SAL),SUM(SAL) FROM EMP
+GROUP BY TO_CHAR(HIREDATE,'YY');
+
+6.
+SELECT COUNT(*) "TOTAL",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1980 THEN 1 ELSE 0 END) "1980",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1981 THEN 1 ELSE 0 END) "1981",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1982 THEN 1 ELSE 0 END) "1982",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1983 THEN 1 ELSE 0 END) "1983"        
+FROM EMP
+WHERE EXTRACT(year FROM hiredate) BETWEEN 1980 AND 1983;
+
+7. 
+SELECT job, 
+            NVL(TO_CHAR( SUM(case deptno WHEN 10 then sal end) ), ' ') "Deptno 10",
+            NVL(TO_CHAR( SUM(case deptno WHEN 20 then sal end) ), ' ') "Deptno 20",
+            NVL(TO_CHAR( SUM(case deptno WHEN 30 then sal end) ), ' ') "Deptno 30",                        
+            SUM(sal) "Total"
+FROM EMP
+GROUP BY job;
+
