@@ -113,6 +113,10 @@ SELECT ENAME, JOB, SAL, COMM, SAL+COMM FROM EMP;
 select * from EMP;
 
 
+
+
+--2022-07-06 문제#####################################################################################################################################################################
+
 --SELECT 
 --case SEX 
 --when '1' then '남자'
@@ -141,20 +145,16 @@ SELECT COUNT(EMPNO) 인원수, MAX(SAL) "최대 급여", MIN(SAL) "최소 급여", SUM(SAL)
 
 
 --2. EMP 테이블에서 각 업무별로 최대 급여,최소 급여,급여의 합을 출력하는 SELECT 문장을 작성하여라.
-
 SELECT JOB 인원수, MAX(SAL) "최대 급여", MIN(SAL) "최소 급여", SUM(SAL) "급여의 합" FROM EMP GROUP BY JOB;
 
 
 --3. EMP 테이블에서 업무별 인원수를 구하여 출력하는 SELECT 문장을 작성하여라.
-
 SELECT JOB 업무, COUNT(SAL) "인원수" FROM EMP GROUP BY JOB;
 
 
 --4. EMP 테이블에서 최고 급여와 최소 급여의 차이는 얼마인가 출력하는 SELECT 문장을 작성하여라.
 
 SELECT MAX(SAL) - MIN(SAL) "급여 차" FROM EMP;
-
-
 
 
 --5. EMP 테이블에서 아래의 결과를 출력하는 SELECT 문장을 작성하여라.(group by)
@@ -187,12 +187,15 @@ SELECT SUM(COUNT(JOB)) TOTAL,
 	SUM(COUNT(CASE WHEN TO_CHAR(HIREDATE, 'YY') = '83' THEN HIREDATE END)) AS "1983"
 FROM EMP GROUP BY JOB;
 
---SELECT SUM(COUNT(JOB)) TOTAL,
---	SUM(COUNT(CASE WHEN HIREDATE LIKE '1980%' THEN HIREDATE END) AS "1980")
---FROM EMP GROUP BY JOB;
-
-
-SELECT * FROM EMP;
+--강사님 정답
+SELECT COUNT(*) "TOTAL",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1980 THEN 1 ELSE 0 END) "1980",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1981 THEN 1 ELSE 0 END) "1981",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1982 THEN 1 ELSE 0 END) "1982",
+  SUM(case EXTRACT(year FROM hiredate) WHEN 1983 THEN 1 ELSE 0 END) "1983"        
+FROM EMP
+WHERE EXTRACT(year FROM hiredate) BETWEEN 1980 AND 1983;
+--코드 부분적으로는 달라도 큰 결은 똑같긴한데, 아직 내가 CASE문이나 GROUP BY문이 익숙하지가 않아서 그런듯. 적응 적응
 
 
 --
@@ -213,11 +216,96 @@ SELECT * FROM EMP;
 --ANALYST	                      6000                        6000
  
 SELECT JOB,
-	CASE WHEN DEPTNO = 10 THEN SAL END AS "Deptno 10",
-	CASE WHEN DEPTNO = 20 THEN SAL END AS "Deptno 20",
-	CASE WHEN DEPTNO = 30 THEN SAL END AS "Deptno 30",
-	SAL
-FROM EMP;
+	SUM(CASE WHEN DEPTNO = 10 THEN SAL END) AS "Deptno 10",
+	SUM(CASE WHEN DEPTNO = 20 THEN SAL END) AS "Deptno 20",
+	SUM(CASE WHEN DEPTNO = 30 THEN SAL END) AS "Deptno 30",
+	SUM(SAL)
+FROM EMP GROUP BY JOB;
+
+--강사님 코드
+SELECT job, 
+            NVL(TO_CHAR( SUM(case deptno WHEN 10 then sal end) ), ' ') "Deptno 10",
+            NVL(TO_CHAR( SUM(case deptno WHEN 20 then sal end) ), ' ') "Deptno 20",
+            NVL(TO_CHAR( SUM(case deptno WHEN 30 then sal end) ), ' ') "Deptno 30",                        
+            SUM(sal) "Total"
+FROM EMP
+GROUP BY job;
+--이것도 6번하고 동일하게 코드의 결은 비슷하다. 역시나 CASE문이나 GROUP BY 문에 익숙해져야 할듯
+
+
+--2022-07-07 문제#####################################################################################################################################################################
+--
+--1. EMP 테이블에서 모든 사원에 대한 이름,부서번호,부서명을 출력하는 SELECT 문장을 작성하여라.
+SELECT ENAME, E.DEPTNO, D.DNAME FROM EMP E, DEPT D WHERE E.DEPTNO = D.DEPTNO ORDER BY DEPTNO;	--INNER JOIN 
+SELECT ENAME, DEPTNO, DNAME FROM EMP E NATURAL JOIN DEPT D ORDER BY DEPTNO; --NATURAL JOIN
+
+
+--2. EMP 테이블에서 NEW YORK에서 근무하고 있는 사원에 대하여 이름,업무,급여,부서명을 출력하는 SELECT 문장을 작성하여라.
+SELECT ENAME, JOB, SAL, D.DNAME FROM EMP E, DEPT D WHERE E.DEPTNO = D.DEPTNO AND E.DEPTNO = 10;	--INNER JOIN
+SELECT ENAME, JOB, SAL, DNAME FROM EMP E NATURAL JOIN DEPT D WHERE LOC = 'NEW YORK'; --NATURAL JOIN
+
+
+--3. EMP 테이블에서 보너스를 받는 사원에 대하여 이름,부서명,위치를 출력하는 SELECT 문장을 작성하여라.
+SELECT ENAME, D.DNAME, D.LOC, COMM FROM EMP E, DEPT D WHERE E.DEPTNO = D.DEPTNO AND E.COMM > 0;--INNER JOIN
+SELECT ENAME, D.DNAME, LOC, COMM FROM EMP E NATURAL JOIN DEPT D WHERE COMM > 0; --NATURAL JOIN
+
+
+--4. EMP 테이블에서 이름 중 L자가 있는 사원에 대하여 이름,업무,부서명,위치를 출력하는 SELECT 문장을 작성하여라.
+SELECT ENAME, JOB, D.DNAME, D.LOC FROM EMP E, DEPT D WHERE E.DEPTNO = D.DEPTNO AND E.ENAME LIKE '%L%';--INNER JOIN
+SELECT ENAME, JOB, DNAME, LOC FROM EMP E NATURAL JOIN DEPT D WHERE ENAME LIKE '%L%'; --NATURAL JOIN
+
+
+--5. 아래의 결과를 출력하는 SELECT 문장을 작성하여라.(관리자가 없는 King을 포함하여 모든 사원을 출력)
+--
+--Employee        Emp# Manager         Mgr#
+--
+------------ --------- ---------- ---------
+--
+--KING            7839
+--
+--BLAKE           7698 KING            7839
+--
+--CLARK           7782 KING            7839
+--
+--. . . . . . . . . .
+--
+--14 rows selected.
+
+SELECT E1.ENAME "Employee", E1.EMPNO "Emp#", E2.ENAME "Manager", E2.EMPNO "Mgr#" FROM EMP E1, EMP E2 WHERE E1.MGR = E2.EMPNO(+);
+
+SELECT * FROM EMP E1, EMP E2 WHERE E1.MGR = E2.EMPNO(+);
+
+
+--6. EMP 테이블에서 그들의 관리자 보다 먼저 입사한 사원에 대하여 이름,입사일,관리자 이름, 관리자 입사일을 출력하는 SELECT 문장을 작성하여라.
+SELECT E1.ENAME "Employee", E1.HIREDATE "입사일", E2.ENAME "Manager", E2.HIREDATE "입사일" FROM EMP E1, EMP E2 WHERE E1.MGR = E2.EMPNO(+) AND E2.HIREDATE - E1.HIREDATE > 0;
+
+--7. EMP 테이블에서 사원의 급여와 사원의 급여 양만큼 “*”를 출력하는 SELECT 문장을 작성하여라. 단 “*”는 100을 의미한다.
+--
+--Employee and their salary
+--
+-------------------------------------------------------------------
+--
+--KING      **************************************************
+--
+--BLAKE     ****************************
+--
+--CLARK     ************************
+--
+--JONES     *****************************
+--
+--MARTIN    ************
+--
+--ALLEN     ****************
+--
+--TURNER    ***************
+--
+--. . . . . . . . . .
+--
+--14 rows selected.
+
+SELECT RPAD(ENAME||'     ', TRUNC(SAL/100) + LENGTH(ENAME||'     '), '*') "Employee and their salary"  FROM EMP;
+
+
 
 
 
