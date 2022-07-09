@@ -1,0 +1,34 @@
+create table phone
+(
+	pname varchar(8),
+	pnum varchar(13)
+
+
+);
+
+SELECT * from tab;
+
+purge RECYCLEBIN;
+
+
+SELECT * FROM PHONE;
+
+ALTER TABLE PHONE MODIFY PNAME VARCHAR(10);
+
+
+INSERT INTO PHONE VALUES('김영운', '01045020614');
+INSERT INTO PHONE VALUES('김봉남', '01052290416');
+INSERT INTO PHONE VALUES('박노진', '01022318456');
+INSERT INTO PHONE VALUES('안시연', '01224502823');
+
+INSERT INTO PHONE VALUES('김홍수', '0189382034');
+INSERT INTO PHONE VALUES('신수경', '0162452823');
+
+DELETE phone where pname = '안시';
+
+SELECT SUBSTR(PNUM, -5) from phone;
+
+--전화번호에 -가 안붙어 있다면 붙여주는 코
+SELECT pname, SUBSTR(REPLACE(PNUM, '01'||SUBSTR(PNUM, 3, 1), '01'||SUBSTR(PNUM, 3, 1)||'-'), 1, LENGTH(PNUM) - 3)||SUBSTR(REPLACE(PNUM, SUBSTR(PNUM, -5, 1), SUBSTR(PNUM, -5, 1)||'-'), -5) AS 전화번호 FROM PHONE;-- REPLACE(SUBSTR(PNUM, 3) != '-', ;
+
+DESC EMP;
