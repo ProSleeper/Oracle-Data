@@ -315,55 +315,59 @@ SELECT RPAD(ENAME||'     ', TRUNC(SAL/100) + LENGTH(ENAME||'     '), '*') "Emplo
 SELECT ENAME, HIREDATE FROM EMP WHERE DEPTNO = (SELECT DEPTNO FROM EMP WHERE ENAME = UPPER('blake'));
 
 --2. EMP 테이블에서 평균 급여 이상을 받는 모든 종업원에 대해서 종업원 번호와 이름을 출력하는 SELECT문을 작성하시오. 단 급여가 많은 순으로 출력하여라.
-
+SELECT EMPNO, ENAME, SAL FROM EMP WHERE SAL >= (SELECT AVG(SAL) FROM EMP) ORDER BY SAL DESC;
 
 --3. EMP 테이블에서 이름에 “T”가 있는 사원이 근무하는 부서에서 근무하는 모든 종업원에 대해 사원 번호,이름,급여를 출력하는 SELECT문을 작성하시오. 단 사원번호 순으로 출력하여라.
-
+SELECT EMPNO, ENAME, SAL FROM EMP WHERE DEPTNO IN(SELECT DEPTNO FROM EMP WHERE ENAME LIKE '%T%') ORDER BY EMPNO;
 
 --4. EMP 테이블에서 부서 위치가 Dallas인 모든 종업원에 대해 이름,업무,급여를 출력하는 SELECT문을 작성하시오.
-
-
+SELECT ENAME, JOB, SAL FROM EMP WHERE DEPTNO = (SELECT DEPTNO FROM DEPT WHERE LOC = 'DALLAS');
 
 --5. EMP 테이블에서 King에게 보고하는 모든 사원의 이름과 급여를 출력하는 SELECT문을 작성하시오.
-
-
-
+SELECT ENAME, SAL FROM EMP WHERE MGR = (SELECT EMPNO FROM EMP WHERE ENAME = 'KING');
 
 --6. EMP 테이블에서 SALES부서 사원의 이름,업무를 출력하는 SELECT문을 작성하시오.
-
-
-
+SELECT ENAME, JOB FROM EMP WHERE DEPTNO = (SELECT DEPTNO FROM DEPT WHERE DNAME = 'SALES');
 
 --7. EMP 테이블에서 월급이 부서 30의 최저 월급보다 높은 사원을 출력하는 SELECT문을 작성하시오.
-
-
+SELECT * FROM EMP WHERE SAL > (SELECT MIN(SAL) FROM EMP WHERE DEPTNO = 30);
 
 --8. EMP 테이블에서 부서 10에서 부서 30의 사원과 같은 업무를 맡고 있는 사원의 이름과 업무를 출력하는 SELECT문을 작성하시오.
-
-
+SELECT ENAME, JOB FROM EMP WHERE DEPTNO = 10 AND JOB IN(SELECT JOB FROM EMP WHERE DEPTNO = 30);
 
 --9. EMP 테이블에서 FORD와 업무도 월급도 같은 사원의 모든 정보를 출력하는 SELECT문을 작성하시오.
-
+SELECT * FROM EMP WHERE (JOB, SAL) = (SELECT JOB, SAL FROM EMP WHERE ENAME = 'FORD') AND ENAME ^= 'FORD';
 
 --10. EMP 테이블에서 업무가 JONES와 같거나 월급이 FORD이상인 사원의 정보를 이름,업무,부서번호,급여를 출력하는 SELECT문을 작성하시오.
-
+SELECT ENAME, JOB, DEPTNO, SAL
+FROM EMP
+WHERE 	JOB = (SELECT JOB FROM EMP WHERE ENAME = 'JONES') AND ENAME != 'JONES'
+	OR	SAL >= (SELECT SAL FROM EMP WHERE ENAME = 'FORD') AND ENAME != 'FORD';
 
 --11. EMP 테이블에서 SCOTT 또는 WARD와 월급이 같은 사원의 정보를 이름,업무,급여를 출력하는 SELECT문을 작성하시오.
+SELECT ENAME, JOB, SAL FROM EMP WHERE SAL IN(SELECT SAL FROM EMP WHERE ENAME IN('SCOTT', 'WARD')) AND ENAME NOT IN('SCOTT', 'WARD');
 
 --12. EMP 테이블에서 CHICAGO에서 근무하는 사원과 같은 업무를 하는 사원의 이름,업무를 출력하는 SELECT문을 작성하시오.
+SELECT ENAME, JOB FROM EMP 
+WHERE JOB IN(SELECT DISTINCT JOB FROM EMP WHERE DEPTNO = (SELECT DEPTNO FROM DEPT WHERE LOC = 'CHICAGO'))
+AND (SELECT DEPTNO FROM DEPT WHERE LOC = 'CHICAGO') <> DEPTNO ;
 
 --13. EMP 테이블에서 부서별로 월급이 평균 월급보다 높은 사원을 부서번호,이름,급여를 출력하는 SELECT문을 작성하시오.
-
+SELECT DEPTNO, ENAME, SAL FROM EMP E WHERE SAL > (SELECT AVG(SAL) FROM EMP WHERE DEPTNO = E.DEPTNO) ORDER BY DEPTNO;
 
 --14. EMP 테이블에서 업무별로 월급이 평균 월급보다 낮은 사원을 부서번호,이름,급여를 출력하는 SELECT문을 작성하시오.
-
+SELECT JOB, DEPTNO, ENAME, SAL FROM EMP E WHERE SAL < (SELECT AVG(SAL) FROM EMP WHERE JOB = E.JOB) ORDER BY JOB;
 
 --15. EMP 테이블에서 적어도 한명 이상으로부터 보고를 받을 수 있는 사원을 업무,이름,사원번호,부서번호를 출력하는 SELECT문을 작성하시오.
+SELECT JOB, ENAME, EMPNO, DEPTNO FROM EMP WHERE EMPNO IN(SELECT MGR FROM EMP) ORDER BY EMPNO;
 
 
 --16. EMP 테이블에서 말단 사원의 사원번호,이름,업무,부서번호를 출력하는 SELECT문을 작성하시오.
+--입사일이 가장 늦은 사람
+SELECT EMPNO, ENAME, JOB, DEPTNO FROM EMP WHERE HIREDATE = (SELECT MAX(HIREDATE) FROM EMP); 
 
-
+--매니저가 아닌 사람(MGR 컬럼에 자기 사원번호가 없는 사람)
+SELECT EMPNO, ENAME, JOB, DEPTNO FROM EMP WHERE EMPNO NOT IN(SELECT DISTINCT MGR FROM EMP WHERE MGR IS NOT NULL) ORDER BY EMPNO;
 
 
 
